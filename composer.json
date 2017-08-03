@@ -1,0 +1,36 @@
+{
+	"name"		: "dekuan/dedid",
+	"description"	: "An unique id generator for distributed database by DeKuan, Inc.",
+	"type"		: "library",
+	"license"	: "proprietary",
+	"authors" :
+	[
+		{
+			"name" : "liuqixing",
+			"email" : "liuqixing@dekuan.org"
+		}
+	],
+	"extra":
+	{
+		"branch-alias":
+		{
+			"dev-master" : "0.3.x-dev"
+		}
+	},
+	"require":
+	{
+		"php" : ">=5.3.0"
+	},
+	"require-dev" :
+	{
+		"phpunit/phpunit" : "~4.0"
+	},
+	"autoload":
+	{
+		"psr-4" : { "dekuan\\" : "src" }
+	},
+	"autoload-dev" :
+	{
+		"psr-4" : { "dekuan\\" : "src" }
+	}
+}
