@@ -39,16 +39,16 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 		$arrResult	= [];
 		$arrUnique	= [];
 		$nHostMax	= 63;
-		$nTableMax	= 127;
+		$nTableMax	= 63;
 
 		for ( $i = 0; $i < 1; $i ++ )
 		{
-			for ( $nHost = 0; $nHost <= $nHostMax; $nHost ++ )
+			for ( $nCenter = 0; $nCenter <= $nHostMax; $nCenter ++ )
 			{
-				for ( $nTable = 0; $nTable <= $nTableMax; $nTable ++ )
+				for ( $nNode = 0; $nNode <= $nTableMax; $nNode ++ )
 				{
 					$arrD	= [];
-					$nNewId	= $cDId->createId( $nHost, $nTable, $arrD );
+					$nNewId	= $cDId->createId( $nCenter, $nNode, $arrD );
 					$arrId	= $cDId->parseId( $nNewId );
 					
 					$sHexId	= dechex( $nNewId );
@@ -58,8 +58,8 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 
 					$arrItem =
 						[
-							'h'	=> $nHost,
-							't'	=> $nTable,
+							'h'	=> $nCenter,
+							't'	=> $nNode,
 							'id'	=> $nNewId,
 							'r'	=> $arrId,
 						];
@@ -73,9 +73,9 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 
 
 		var_dump( count( $arrResult ), count( $arrUnique ) );
-//		
-//		file_put_contents( 'result.json', json_encode( $arrResult ) );
-//		file_put_contents( 'unique.json', json_encode( $arrUnique ) );
+
+		file_put_contents( 'test-result.json', json_encode( $arrResult ) );
+		file_put_contents( 'test-unique.json', json_encode( $arrUnique ) );
 
 	}
 
