@@ -7,33 +7,39 @@ namespace dekuan\dedid;
 //	================================================================================
 //
 //
-//	0 xxxxxx xxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xx xxxxxxxx
-//	- ------ ------- -------------------------------------------- -----------
-//	  Host   Table   Escaped Time (in millisecond)                Random
-//	1 6      7       40 bits                                      10 bits
-//	  0~63   0~127   0~34 (years)                                 0~1023
+//	0 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx x xxxxxx xxxxxx xx xxxxxxxx
+//	- ---------------------------------------------- ------ ------ -----------
+//	  Escaped Time (in millisecond)                  Center Node   Random
+//	1 41 bits                                        6      6      10 bits
+//	  0~69 (years)                                   0~63   0~63   0~1023
 //	
 //	
-//	host
-//	01111110 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-//	7E       00       00       00       00       00       00       00
+//	Center
+//	0 00000000 00000000 00000000 00000000 00000000 0 111111 000000 00 00000000
+//	00000000 00000000 00000000 00000000 00000000 00111111 00000000 00000000
+//	00       00       00       00       00       3F       00       00
 //	
-//	table
-//	00000001 11111100 00000000 00000000 00000000 00000000 00000000 00000000
-//	01       FC       00       00       00       00       00       00
+//	Node
+//	0 00000000 00000000 00000000 00000000 00000000 0 000000 111111 00 00000000
+//	00000000 00000000 00000000 00000000 00000000 00000000 11111100 00000000
+//	00       00       00       00       00       00       FC       00
 //	
-//	escaped time
-//	00000000 00000011 11111111 11111111 11111111 11111111 11111100 00000000
-//	00       03       FF       FF       FF       FF       FC       00
-//	
-//	random
+//	Escaped Time
+//	0 11111111 11111111 11111111 11111111 11111111 1 000000 000000 00 00000000
+//	01111111 11111111 11111111 11111111 11111111 11000000 00000000 00000000
+//	7F       FF       FF       FF       FF       C0       00       00
+//
+//	Random
+//	0 00000000 00000000 00000000 00000000 00000000 0 000000 000000 11 11111111
 //	00000000 00000000 00000000 00000000 00000000 00000000 00000011 11111111
 //	00       00       00       00       00       00       03       FF
 //
 
 
+
 /**
- *     CDId 
+ *	An unique id generator for primary key of distributed database
+ *	class CDId 
  */
 class CDId
 {
@@ -46,8 +52,6 @@ class CDId
 	 *	Epoch Offset :	November 7, 2016 00:00:00 GMT
 	 */
 	CONST EPOCH_OFFSET = 1478476800000;
-
-
 
 	
 
@@ -70,18 +74,18 @@ class CDId
 	/**
 	 *	Generate an unique id
 	 *
-	 *	@param $nHost int	host id ( 0 ~ 63 )
-	 *	@param $nTable int	table id ( 0 ~ 127 )
+	 *	@param $nCenter int	data center id ( 0 ~ 63 )
+	 *	@param $nNode int	data node id ( 0 ~ 63 )
 	 *	@param $arrData &array	details about the id
 	 *	@return int(64)	id
 	 */
-	public function createId( $nHost, $nTable, & $arrData = null )
+	public function createId( $nCenter, $nNode, & $arrData = null )
 	{
-		if ( ! $this->isValidHostId( $nHost ) )
+		if ( ! $this->isValidCenterId( $nCenter ) )
 		{
 			return null;
 		}
-		if ( ! $this->isValidTableId( $nTable ) )
+		if ( ! $this->isValidNodeId( $nNode ) )
 		{
 			return null;
 		}
@@ -91,22 +95,22 @@ class CDId
 		$nTime	= $this->getEscapedTime();
 		$nRand	= rand( 0, 0x3FF );
 
-		$nHostV	= ( ( $nHost  << 57 ) & 0x7E00000000000000 );
-		$nTabV	= ( ( $nTable << 50 ) & 0x01FC000000000000 );
-		$nTimeV	= ( ( $nTime  << 10 ) & 0x0003FFFFFFFFFC00 );
-		$nRandV	= ( ( $nRand  << 0  ) & 0x00000000000003FF );
+		$nCenterV	= ( ( $nCenter << 16 ) & 0x00000000003F0000 );
+		$nNodeV		= ( ( $nNode   << 10 ) & 0x000000000000FC00 );
+		$nTimeV		= ( ( $nTime   << 22 ) & 0x7FFFFFFFFFC00000 );
+		$nRandV		= ( ( $nRand   << 0  ) & 0x00000000000003FF );
 
-		$nRet	= ( $nHostV + $nTabV + $nTimeV + $nRandV );
+		$nRet		= ( $nCenterV + $nNodeV + $nTimeV + $nRandV );
 
 		//	...
 		if ( ! is_null( $arrData ) )
 		{
 			$arrData =
 			[
-				'host'	=> $nHost,
-				'table'	=> $nTable,
-				'time'	=> $nTime,
-				'rand'	=> $nRand,
+				'center'	=> $nCenter,
+				'node'		=> $nNode,
+				'time'		=> $nTime,
+				'rand'		=> $nRand,
 			];
 		}
 
@@ -126,27 +130,28 @@ class CDId
 			return null;
 		}
 
-		$nHost	= ( ( $nId & 0x7E00000000000000 ) >> 57 );
-		$nTable	= ( ( $nId & 0x01FC000000000000 ) >> 50 );
-		$nTime	= ( ( $nId & 0x0003FFFFFFFFFC00 ) >> 10 );
-		$nRand	= ( ( $nId & 0x00000000000003FF ) >> 0  );
+		//	...
+		$nCenter	= ( ( $nId & 0x00000000003F0000 ) >> 16 );
+		$nNode		= ( ( $nId & 0x000000000000FC00 ) >> 10 );
+		$nTime		= ( ( $nId & 0x7FFFFFFFFFC00000 ) >> 22 );
+		$nRand		= ( ( $nId & 0x00000000000003FF ) >> 0  );
 
 		return
 		[
-			'host'	=> $nHost,
-			'table'	=> $nTable,
-			'time'	=> $nTime,
-			'rand'	=> $nRand,
+			'center'	=> $nCenter,
+			'node'		=> $nNode,
+			'time'		=> $nTime,
+			'rand'		=> $nRand,
 		];
 	}
 
-	public function isValidHostId( $nVal )
+	public function isValidCenterId( $nVal )
 	{
 		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 63 );
 	}
-	public function isValidTableId( $nVal )
+	public function isValidNodeId( $nVal )
 	{
-		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 127 );
+		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 63 );
 	}
 
 
