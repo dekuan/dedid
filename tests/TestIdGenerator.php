@@ -32,7 +32,31 @@ use dekuan\dedid\CDId;
  */
 class TestIdGenerator extends PHPUnit_Framework_TestCase
 {
-	public function testCreateNew()
+	public function testCreateNewMore()
+	{
+		$cDId		= CDId::getInstance();
+		$nHostMax	= 63;
+		$nTableMax	= 63;
+
+		for ( $nCenter = 0; $nCenter <= $nHostMax; $nCenter ++ )
+		{
+			for ( $nNode = 0; $nNode <= $nTableMax; $nNode ++ )
+			{
+				$arrD	= [];
+				$nNewId	= $cDId->createId( $nCenter, $nNode, $arrD );
+				$arrId	= $cDId->parseId( $nNewId );
+
+				$this->assertSame( $arrId, $arrD );
+
+				echo __FUNCTION__ . " :: createId = " . $nNewId . "\r\n";
+				echo __FUNCTION__ . " :: parseId\r\n";
+				print_r( $arrId );
+			}
+		}
+
+	}
+
+	public function testCreateNewBatch()
 	{
 		$cDId		= CDId::getInstance();
 
@@ -68,7 +92,7 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 					$arrResult[] 		= $arrItem;
 					$arrUnique[ $nNewId ]	= $arrItem;
 				}
-			}			
+			}
 		}
 
 

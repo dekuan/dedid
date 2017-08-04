@@ -36,8 +36,10 @@ namespace dekuan\dedid;
 //
 
 
+
 /**
- *     CDId 
+ *	An unique id generator for primary key of distributed database
+ *	class CDId 
  */
 class CDId
 {
@@ -50,8 +52,6 @@ class CDId
 	 *	Epoch Offset :	November 7, 2016 00:00:00 GMT
 	 */
 	CONST EPOCH_OFFSET = 1478476800000;
-
-
 
 	
 
