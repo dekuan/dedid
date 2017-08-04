@@ -145,6 +145,35 @@ class CDId
 		];
 	}
 
+	/**
+	 *	Verify whether the id is valid
+	 *
+	 *	@param $nVal int	64 bits unique id
+	 *	@return boolean		true or false
+	 */
+	public function isValidId( $nVal )
+	{
+		$bRet	= false;
+		$arrD	= $this->parseId( $nVal );
+		if ( is_array( $arrD ) &&
+			array_key_exists( 'center', $arrD ) &&
+			array_key_exists( 'node', $arrD ) &&
+			array_key_exists( 'time', $arrD ) &&
+			array_key_exists( 'rand', $arrD ) )
+		{
+			if ( $this->isValidCenterId( $arrD[ 'center' ] ) &&
+				$this->isValidNodeId( $arrD[ 'node' ] ) &&
+				$this->isValidTime( $arrD[ 'time' ] ) &&
+				$this->isValidRand( $arrD[ 'rand' ] ) )
+			{
+				$bRet = true;
+			}
+		}
+
+		return $bRet;
+	}
+	
+	
 	public function isValidCenterId( $nVal )
 	{
 		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 63 );
@@ -152,6 +181,14 @@ class CDId
 	public function isValidNodeId( $nVal )
 	{
 		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 63 );
+	}
+	public function isValidTime( $nVal )
+	{
+		return is_numeric( $nVal ) && ( $nVal >= 0 );
+	}
+	public function isValidRand( $nVal )
+	{
+		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 0x3FF );
 	}
 
 
