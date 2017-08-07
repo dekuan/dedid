@@ -32,6 +32,30 @@ use dekuan\dedid\CDId;
  */
 class TestIdGenerator extends PHPUnit_Framework_TestCase
 {
+	public function testCreateNewCrc32()
+	{
+		$cDId		= CDId::getInstance();
+		$nHostMax	= 63;
+		$nTableMax	= 63;
+
+		for ( $nCenter = 0; $nCenter <= $nHostMax; $nCenter ++ )
+		{
+			for ( $nNode = 0; $nNode <= $nTableMax; $nNode ++ )
+			{
+				$sSrc	= sprintf( "user-%d-%d", $nCenter, $nNode );
+				$arrD	= [];
+				$nNewId	= $cDId->createId( $nCenter, $nNode, $sSrc, $arrD );
+				$arrId	= $cDId->parseId( $nNewId );
+
+				$this->assertSame( $arrId, $arrD );
+
+				echo __FUNCTION__ . " :: createId = " . $nNewId . "\r\n";
+				echo __FUNCTION__ . " :: parseId\r\n";
+				print_r( $arrId );
+			}
+		}
+	}
+
 	public function testCreateNewMore()
 	{
 		$cDId		= CDId::getInstance();
@@ -43,7 +67,7 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 			for ( $nNode = 0; $nNode <= $nTableMax; $nNode ++ )
 			{
 				$arrD	= [];
-				$nNewId	= $cDId->createId( $nCenter, $nNode, $arrD );
+				$nNewId	= $cDId->createId( $nCenter, $nNode, null, $arrD );
 				$arrId	= $cDId->parseId( $nNewId );
 
 				$this->assertSame( $arrId, $arrD );
@@ -53,7 +77,6 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 				print_r( $arrId );
 			}
 		}
-
 	}
 
 	public function testCreateNewBatch()
@@ -72,7 +95,7 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 				for ( $nNode = 0; $nNode <= $nTableMax; $nNode ++ )
 				{
 					$arrD	= [];
-					$nNewId	= $cDId->createId( $nCenter, $nNode, $arrD );
+					$nNewId	= $cDId->createId( $nCenter, $nNode, null, $arrD );
 					$arrId	= $cDId->parseId( $nNewId );
 					
 					$sHexId	= dechex( $nNewId );

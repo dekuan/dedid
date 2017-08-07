@@ -68,7 +68,7 @@ Bits	| Usage	| Remark
 
 # HOW TO USE
 
-### Create an new id
+### Create an new id normally
 
 ~~~
 $cDId		= CDId::getInstance();
@@ -76,7 +76,7 @@ $nCenter	= 61;
 $nNode		= 37;
 
 $arrD		= [];
-$nNewId	= $cDId->createId( $nCenter, $nNode, $arrD );
+$nNewId	= $cDId->createId( $nCenter, $nNode, null, $arrD );
 
 echo "new id = " . $nNewId . "\r\n";
 print_r( $arrD );
@@ -95,6 +95,38 @@ Array
     [rand] => 486
 )
 ~~~
+
+
+### Create an new id with crc32 hash value
+
+~~~
+$cDId		= CDId::getInstance();
+$nCenter	= 0;
+$nNode		= 15;
+
+$sSrc		= "dekuan";
+$arrD		= [];
+$nNewId	= $cDId->createId( $nCenter, $nNode, $sSrc, $arrD );
+
+echo "new id = " . $nNewId . "\r\n";
+print_r( $arrD );
+
+~~~
+
+##### output
+
+~~~
+new id = 99087647783270610
+Array
+(
+    [center] => 0
+    [node] => 15
+    [time] => 23624336191
+    [rand] => 210
+)
+~~~
+
+
 
 
 ### Parse an id for getting the details

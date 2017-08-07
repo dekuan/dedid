@@ -76,10 +76,11 @@ class CDId
 	 *
 	 *	@param $nCenter int	data center id ( 0 ~ 63 )
 	 *	@param $nNode int	data node id ( 0 ~ 63 )
+	 *	@param $sSource string	source string for calculating crc32 hash value
 	 *	@param $arrData &array	details about the id
 	 *	@return int(64)	id
 	 */
-	public function createId( $nCenter, $nNode, & $arrData = null )
+	public function createId( $nCenter, $nNode, $sSource = null, & $arrData = null )
 	{
 		if ( ! $this->isValidCenterId( $nCenter ) )
 		{
@@ -93,8 +94,18 @@ class CDId
 		//	...
 		$nRet	= 0;
 		$nTime	= $this->getEscapedTime();
-		$nRand	= rand( 0, 0x3FF );
 
+		if ( is_string( $sSource ) && strlen( $sSource ) > 0 )
+		{
+			//	use crc32 hash value instead of rand
+			$nRand	= crc32( $sSource );
+		}
+		else
+		{
+			$nRand	= rand( 0, 0x3FF );
+		}
+
+		//	...
 		$nCenterV	= ( ( $nCenter << 16 ) & 0x00000000003F0000 );
 		$nNodeV		= ( ( $nNode   << 10 ) & 0x000000000000FC00 );
 		$nTimeV		= ( ( $nTime   << 22 ) & 0x7FFFFFFFFFC00000 );
@@ -110,7 +121,7 @@ class CDId
 				'center'	=> $nCenter,
 				'node'		=> $nNode,
 				'time'		=> $nTime,
-				'rand'		=> $nRand,
+				'rand'		=> $nRandV,
 			];
 		}
 
