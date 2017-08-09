@@ -1,0 +1,39 @@
+{
+	"name"		: "dedid",
+	"homepage"	: "https://github.com/dekuan/dedid",
+	"authors"	:
+	[
+		"liuqixing <liuqixing@dekuan.org>"
+	],
+	"description"	: "An unique id generator for primary key of distributed database.",
+	"main"		:
+	[
+		"dedid.js"
+	],
+	"keywords"	:
+	[
+		"dekuan",
+		"dedid",
+		"unique id generator",
+		"primary key",
+		"distributed database",
+		"library"
+	],
+	"license": "MIT",
+	"ignore":
+	[
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"test",
+		"tests",
+		"src",
+		"composer.json",
+		"karma.conf.js",
+		"mocha.opts",
+		"package.json",
+	],
+	"dependencies":
+	{
+	}
+}
