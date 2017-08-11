@@ -136,7 +136,7 @@ class CDId
 	 */
 	public function parseId( $nId )
 	{
-		if ( ! is_numeric( $nId ) )
+		if ( ! is_numeric( $nId ) || $nId <= 0 )
 		{
 			return null;
 		}
