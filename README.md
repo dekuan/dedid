@@ -1,5 +1,5 @@
 # dekuan/dedid
-An unique id generator for primary key of distributed database
+An unique id generator for primary key of distributed database.
 
 
 
@@ -56,7 +56,7 @@ Bits	| Usage	| Remark
 ~~~
 
 
-### Random
+### Random or Hash value
 ~~~
 0 00000000 00000000 00000000 00000000 00000000 0 000000 000000 11 11111111
 
