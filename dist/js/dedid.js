@@ -12,6 +12,9 @@ function CDId()
 
 
 	/**
+	 *	*** DOES NOT WORKS IN 32 BITS JavaScript ***
+	 *
+	 * 
 	 *	Parse an unique id
 	 *
 	 *	@param nId int		64 bits unique id
@@ -30,10 +33,10 @@ function CDId()
 		}
 
 		//	...
-		nCenter	= ( ( nId & 0x00000000003F0000 ) >> 16 );
-		nNode	= ( ( nId & 0x000000000000FC00 ) >> 10 );
+		nCenter	= ( ( nId & 0x00000000003E0000 ) >> 17 );
+		nNode	= ( ( nId & 0x000000000001F000 ) >> 12 );
 		nTime	= ( ( nId & 0x7FFFFFFFFFC00000 ) >> 22 );
-		nRand	= ( ( nId & 0x00000000000003FF ) >> 0  );
+		nRand	= ( ( nId & 0x0000000000000FFF ) >> 0  );
 
 		return {
 			'center'	: nCenter,
@@ -45,6 +48,9 @@ function CDId()
 
 
 	/**
+	 *	*** DOES NOT WORKS IN 32 BITS JavaScript ***
+	 *
+	 *  
 	 *	Verify whether the id is valid
 	 *
 	 *	@param nVal int		64 bits unique id
@@ -82,12 +88,12 @@ function CDId()
 
 	this.isValidCenterId = function( nVal )
 	{
-		return _isNumeric( nVal ) && ( nVal >= 0 ) && ( nVal <= 63 );
+		return _isNumeric( nVal ) && ( nVal >= 0 ) && ( nVal <= 31 );
 	};
 
 	this.isValidNodeId = function( nVal )
 	{
-		return _isNumeric( nVal ) && ( nVal >= 0 ) && ( nVal <= 63 );
+		return _isNumeric( nVal ) && ( nVal >= 0 ) && ( nVal <= 31 );
 	};
 
 	this.isValidTime = function( nVal )
@@ -97,7 +103,7 @@ function CDId()
 
 	this.isValidRand = function( nVal )
 	{
-		return _isNumeric( nVal ) && ( nVal >= 0 ) && ( nVal <= 0x3FF );
+		return _isNumeric( nVal ) && ( nVal >= 0 ) && ( nVal <= 0xFFF );
 	};
 
 
