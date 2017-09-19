@@ -1,39 +1,38 @@
 # dekuan/dedid
-An unique id generator for primary key of distributed database.
-This implementation of the algorithm reference Twitter Snowflake,
-but in the last 12 bits you can not only use random numbers, but also get a hash value by a specified string.
+一种为分布式数据库而设计的全局唯一 ID（主键）生成器。
+本算法的实现参考了 Twitter Snowflake，但是在最后的 12 位您不仅仅可以使用随机数字，也可以通过指定字符串来获取哈希值。
+
+
+* [Documentation in English](README.md)
 
 
 
+# 算法
 
-* [简体中文版文档](README.chs.md) 
-
-
-# ALGORITHM
-
-### Bit structure
-It's a 64 bits bigint.
+### 结构体概况
+本算法使用一个 64 位的 int 值作为 ID 的载体。
 
 ~~~
-0 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx x xxxxx xxxxx xxxx xxxxxxxx
+0 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx x xxxxxx xxxxxx xx xxxxxxxx
 ~~~
 
-### Details
+### 结构体说明
 
-Position  | Length   | Usage	| Remark
+位置	| 长度 | 用途	| 备注
 ----------|----------|----------|----------
-0	| 1	| Reserved | Always be 0
-1~41	| 41	| Escaped Time (in millisecond) | 0~69 years
-42~46	| 5	| Number of data center | 0~31
-47~51	| 5	| Number of data node in the data center | 0~31
-52~63	| 12	| Random / Hash | 0~4095
+0			| 1 | 保留位 | 一直都是 0
+1~41			| 41 | 以毫秒为单位的流淌时间 |0~69 年，即本 ID 算法最多可以使用 69 年
+42~46			| 5 | 数据中心编号 | 编号范围 0~31，最多可容纳 32 个数据中心
+47~51			| 5 | 数据中心下属数据节点编号 | 编号范围 0~31，每个数据中心最多可容纳 32 个数据节点。所以整个系统最多可容纳 1024 个数据节点
+52~63			| 12 | 随机数/哈希值 | 取值范围 0~4095
 
 
 
 
-# Bit marks
 
-### Center
+# 位排列
+
+### 数据中心编号
 ~~~
 0 00000000 00000000 00000000 00000000 00000000 0 11111 00000 0000 00000000
 
@@ -42,7 +41,7 @@ Position  | Length   | Usage	| Remark
 00       00       00       00       00       3E       00       00
 ~~~
 
-### Node
+### 数据节点编号
 ~~~
 0 00000000 00000000 00000000 00000000 00000000 0 00000 11111 0000 00000000
 
@@ -52,7 +51,7 @@ Position  | Length   | Usage	| Remark
 ~~~
 
 
-### Escaped Time
+### 流淌时间
 ~~~
 0 11111111 11111111 11111111 11111111 11111111 1 00000 00000 0000 00000000
 
@@ -62,7 +61,7 @@ Position  | Length   | Usage	| Remark
 ~~~
 
 
-### Random or Hash value
+### 随机数/哈希值
 ~~~
 0 00000000 00000000 00000000 00000000 00000000 0 00000 00000 1111 11111111
 
@@ -72,9 +71,9 @@ Position  | Length   | Usage	| Remark
 ~~~
 
 
-# HOW TO USE
+# 使用方法
 
-### Create an new id normally
+### 创建一个普通的随机数 ID
 
 ~~~
 $cDId		= CDId::getInstance();
@@ -89,7 +88,7 @@ print_r( $arrD );
 
 ~~~
 
-##### output
+##### 输出
 
 ~~~
 new id = 114654484990270790
@@ -103,7 +102,7 @@ Array
 ~~~
 
 
-### Create an new id with crc32 hash value by a specified string
+### 指定字符串，创建一个带有哈希值的 ID
 
 ~~~
 $cDId		= CDId::getInstance();
@@ -119,7 +118,7 @@ print_r( $arrD );
 
 ~~~
 
-##### output
+##### 输出
 
 ~~~
 new id = 114654631304370386
@@ -135,7 +134,7 @@ Array
 
 
 
-### Parse an id for getting the details
+### 解析 ID 获取详细信息
 
 ~~~
 $cDId		= CDId::getInstance();
@@ -144,7 +143,7 @@ print_r( $arrId );
 
 ~~~
 
-##### output
+##### 输出
 
 ~~~
 Array
@@ -157,8 +156,8 @@ Array
 ~~~
 
 
-# INSTALL
+# 如何安装
 ~~~
 # composer require dekuan/dedid
 ~~~
-For more information, please visit [https://packagist.org/packages/dekuan/dedid](https://packagist.org/packages/dekuan/dedid)
+了解更多信息，敬请访问 [https://packagist.org/packages/dekuan/dedid](https://packagist.org/packages/dekuan/dedid)

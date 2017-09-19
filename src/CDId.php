@@ -7,34 +7,37 @@ namespace dekuan\dedid;
 //	================================================================================
 //
 //
-//	0 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx x xxxxxx xxxxxx xx xxxxxxxx
-//	- ---------------------------------------------- ------ ------ -----------
-//	  Escaped Time (in millisecond)                  Center Node   Random
-//	1 41 bits                                        6      6      10 bits
-//	  0~69 (years)                                   0~63   0~63   0~1023
+//	0 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx x xxxxx xxxxx xxxx xxxxxxxx
+//	- ---------------------------------------------- ----- ----- -----------
+//	  Escaped Time (in millisecond)                  Center Node Random
+//	1 41 bits                                        5     5     12 bits
+//	  0~69 (years)                                   0~32  0~32  0~4095
 //	
 //	
 //	Center
-//	0 00000000 00000000 00000000 00000000 00000000 0 111111 000000 00 00000000
-//	00000000 00000000 00000000 00000000 00000000 00111111 00000000 00000000
-//	00       00       00       00       00       3F       00       00
+//	0 00000000 00000000 00000000 00000000 00000000 0 11111 00000 0000 00000000
+//	00000000 00000000 00000000 00000000 00000000 00111110 00000000 00000000
+//	00       00       00       00       00       3E       00       00
 //	
 //	Node
-//	0 00000000 00000000 00000000 00000000 00000000 0 000000 111111 00 00000000
-//	00000000 00000000 00000000 00000000 00000000 00000000 11111100 00000000
-//	00       00       00       00       00       00       FC       00
+//	0 00000000 00000000 00000000 00000000 00000000 0 00000 11111 0000 00000000
+//	00000000 00000000 00000000 00000000 00000000 00000001 11110000 00000000
+//	00       00       00       00       00       01       F0       00
 //	
 //	Escaped Time
-//	0 11111111 11111111 11111111 11111111 11111111 1 000000 000000 00 00000000
+//	0 11111111 11111111 11111111 11111111 11111111 1 00000 00000 0000 00000000
 //	01111111 11111111 11111111 11111111 11111111 11000000 00000000 00000000
 //	7F       FF       FF       FF       FF       C0       00       00
 //
 //	Random
-//	0 00000000 00000000 00000000 00000000 00000000 0 000000 000000 11 11111111
-//	00000000 00000000 00000000 00000000 00000000 00000000 00000011 11111111
-//	00       00       00       00       00       00       03       FF
+//	0 00000000 00000000 00000000 00000000 00000000 0 00000 00000 1111 11111111
+//	00000000 00000000 00000000 00000000 00000000 00000000 00001111 11111111
+//	00       00       00       00       00       00       0F       FF
 //
-
+//
+//
+//	php -r 'echo dechex( 0b00111111 );'
+//
 
 
 /**
@@ -74,8 +77,8 @@ class CDId
 	/**
 	 *	Generate an unique id
 	 *
-	 *	@param $nCenter int	data center id ( 0 ~ 63 )
-	 *	@param $nNode int	data node id ( 0 ~ 63 )
+	 *	@param $nCenter int	data center id ( 0 ~ 31 )
+	 *	@param $nNode int	data node id ( 0 ~ 31 )
 	 *	@param $sSource string	source string for calculating crc32 hash value
 	 *	@param $arrData &array	details about the id
 	 *	@return int(64)	id
@@ -102,14 +105,15 @@ class CDId
 		}
 		else
 		{
-			$nRand	= rand( 0, 0x3FF );
+			//	0 ~ 4095
+			$nRand	= rand( 0, 0xFFF );
 		}
 
 		//	...
-		$nCenterV	= ( ( $nCenter << 16 ) & 0x00000000003F0000 );
-		$nNodeV		= ( ( $nNode   << 10 ) & 0x000000000000FC00 );
+		$nCenterV	= ( ( $nCenter << 17 ) & 0x00000000003E0000 );
+		$nNodeV		= ( ( $nNode   << 12 ) & 0x000000000001F000 );
 		$nTimeV		= ( ( $nTime   << 22 ) & 0x7FFFFFFFFFC00000 );
-		$nRandV		= ( ( $nRand   << 0  ) & 0x00000000000003FF );
+		$nRandV		= ( ( $nRand   << 0  ) & 0x0000000000000FFF );
 
 		$nRet		= ( $nCenterV + $nNodeV + $nTimeV + $nRandV );
 
@@ -142,10 +146,10 @@ class CDId
 		}
 
 		//	...
-		$nCenter	= ( ( $nId & 0x00000000003F0000 ) >> 16 );
-		$nNode		= ( ( $nId & 0x000000000000FC00 ) >> 10 );
+		$nCenter	= ( ( $nId & 0x00000000003E0000 ) >> 17 );
+		$nNode		= ( ( $nId & 0x000000000001F000 ) >> 12 );
 		$nTime		= ( ( $nId & 0x7FFFFFFFFFC00000 ) >> 22 );
-		$nRand		= ( ( $nId & 0x00000000000003FF ) >> 0  );
+		$nRand		= ( ( $nId & 0x0000000000000FFF ) >> 0  );
 
 		return
 		[
@@ -187,11 +191,11 @@ class CDId
 	
 	public function isValidCenterId( $nVal )
 	{
-		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 63 );
+		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 31 );
 	}
 	public function isValidNodeId( $nVal )
 	{
-		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 63 );
+		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 31 );
 	}
 	public function isValidTime( $nVal )
 	{
@@ -199,7 +203,7 @@ class CDId
 	}
 	public function isValidRand( $nVal )
 	{
-		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 0x3FF );
+		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 0xFFF );
 	}
 
 

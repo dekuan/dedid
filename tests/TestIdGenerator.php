@@ -18,8 +18,6 @@ ob_start();
 require_once( __DIR__ . "/../vendor/autoload.php");
 require_once( __DIR__ . "/../src/CDId.php");
 
-
-
 use dekuan\dedid\CDId;
 
 
@@ -30,13 +28,13 @@ use dekuan\dedid\CDId;
  * Date: 03/08/2017
  * Time: 9:07 PM
  */
-class TestIdGenerator extends PHPUnit_Framework_TestCase
+class TestIdGenerator extends \PHPUnit\Framework\TestCase
 {
 	public function testCreateNewCrc32()
 	{
 		$cDId		= CDId::getInstance();
-		$nHostMax	= 63;
-		$nTableMax	= 63;
+		$nHostMax	= 31;
+		$nTableMax	= 31;
 
 		for ( $nCenter = 0; $nCenter <= $nHostMax; $nCenter ++ )
 		{
@@ -59,8 +57,8 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 	public function testCreateNewMore()
 	{
 		$cDId		= CDId::getInstance();
-		$nHostMax	= 63;
-		$nTableMax	= 63;
+		$nHostMax	= 31;
+		$nTableMax	= 31;
 
 		for ( $nCenter = 0; $nCenter <= $nHostMax; $nCenter ++ )
 		{
@@ -85,8 +83,8 @@ class TestIdGenerator extends PHPUnit_Framework_TestCase
 
 		$arrResult	= [];
 		$arrUnique	= [];
-		$nHostMax	= 63;
-		$nTableMax	= 63;
+		$nHostMax	= 31;
+		$nTableMax	= 31;
 
 		for ( $i = 0; $i < 1; $i ++ )
 		{
