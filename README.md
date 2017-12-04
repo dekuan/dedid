@@ -1,7 +1,7 @@
 # dekuan/dedid
 An unique id generator for primary key of distributed database.
-This implementation of the algorithm reference Twitter Snowflake,
-but in the last 12 bits you can not only use random numbers, but also get a hash value by a specified string.
+This implementation of the algorithm was referenced by Twitter Snowflake,
+but in the last 12 bits you can not only use the random numbers, but also get a hash value by your specified string.
 
 
 
