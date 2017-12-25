@@ -95,8 +95,10 @@ class CDId
 		}
 
 		//	...
-		$nRet	= 0;
-		$nTime	= $this->getEscapedTime();
+		$nRet		= 0;
+		$nTime		= $this->getEscapedTime();
+		$nCenter	= intval( $nCenter );
+		$nNode		= intval( $nNode );
 
 		if ( is_string( $sSource ) && strlen( $sSource ) > 0 )
 		{
@@ -146,6 +148,7 @@ class CDId
 		}
 
 		//	...
+		$nId		= intval( $nId );
 		$nCenter	= ( ( $nId & 0x00000000003E0000 ) >> 17 );
 		$nNode		= ( ( $nId & 0x000000000001F000 ) >> 12 );
 		$nTime		= ( ( $nId & 0x7FFFFFFFFFC00000 ) >> 22 );
@@ -187,20 +190,38 @@ class CDId
 
 		return $bRet;
 	}
-	
-	
+
+	/**
+	 *	@param $nVal int	64 bits unique id
+	 *	@return boolean		true or false
+	 */
 	public function isValidCenterId( $nVal )
 	{
 		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 31 );
 	}
+
+	/**
+	 *	@param $nVal int	64 bits unique id
+	 *	@return boolean		true or false
+	 */
 	public function isValidNodeId( $nVal )
 	{
 		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 31 );
 	}
+
+	/**
+	 *	@param $nVal int	64 bits unique id
+	 *	@return boolean		true or false
+	 */
 	public function isValidTime( $nVal )
 	{
 		return is_numeric( $nVal ) && ( $nVal >= 0 );
 	}
+
+	/**
+	 *	@param $nVal int	64 bits unique id
+	 *	@return boolean		true or false
+	 */
 	public function isValidRand( $nVal )
 	{
 		return is_numeric( $nVal ) && ( $nVal >= 0 ) && ( $nVal <= 0xFFF );
@@ -226,4 +247,6 @@ class CDId
 	{
 		return intval( $this->getUnixTimestamp() - self::EPOCH_OFFSET );
 	}
+
+
 }
